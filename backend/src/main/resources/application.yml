@@ -1,0 +1,93 @@
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: kbms-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:55432/kbms}
+    username: ${DB_USERNAME:kbms}
+    password: ${DB_PASSWORD:kbms}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    placeholders:
+      vector_dimension: ${KBMS_VECTOR_DIMENSION:768}
+  servlet:
+    multipart:
+      max-file-size: ${KBMS_MAX_UPLOAD_SIZE:20MB}
+      max-request-size: ${KBMS_MAX_UPLOAD_SIZE:20MB}
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+kbms:
+  security:
+    # Set KBMS_JWT_SECRET (>= 32 chars) in every real environment.
+    jwt-secret: ${KBMS_JWT_SECRET:}
+    jwt-ttl-minutes: ${KBMS_JWT_TTL_MINUTES:480}
+    cors-allowed-origins: ${KBMS_CORS_ORIGINS:http://localhost:4200}
+  bootstrap-admin:
+    # No default password: an admin is created only when both values are supplied.
+    email: ${KBMS_ADMIN_EMAIL:}
+    password: ${KBMS_ADMIN_PASSWORD:}
+  storage:
+    directory: ${KBMS_STORAGE_DIR:./data/uploads}
+  documents:
+    allowed-extensions: pdf,docx,txt,md,markdown
+  chunking:
+    target-chars: ${KBMS_CHUNK_CHARS:1200}
+    overlap-chars: ${KBMS_CHUNK_OVERLAP:150}
+  embedding:
+    # local  = offline deterministic hash embedder (development only, lexical not semantic)
+    # ollama = local Ollama daemon, native /api/embeddings, no API key
+    # openai = any OpenAI-compatible /v1/embeddings endpoint (key required)
+    provider: ${KBMS_EMBEDDING_PROVIDER:ollama}
+    model: ${KBMS_EMBEDDING_MODEL:nomic-embed-text-v2-moe:latest}
+    # nomic-embed-text-v2-moe returns 768. Must equal the width the model really returns;
+    # the app verifies this at startup and refuses to write a mismatched vector.
+    dimension: ${KBMS_VECTOR_DIMENSION:768}
+    # For ollama use the daemon root (http://localhost:11434); for openai the /v1 endpoint.
+    base-url: ${KBMS_EMBEDDING_BASE_URL:http://localhost:11434}
+    api-key: ${KBMS_EMBEDDING_API_KEY:}
+    timeout-seconds: ${KBMS_EMBEDDING_TIMEOUT:120}
+  llm:
+    # ollama = local Ollama daemon, native /api/chat, no API key
+    # openai = any OpenAI-compatible /v1/chat/completions endpoint (key required)
+    provider: ${KBMS_LLM_PROVIDER:ollama}
+    model: ${KBMS_LLM_MODEL:gemma:2b}
+    base-url: ${KBMS_LLM_BASE_URL:http://localhost:11434}
+    api-key: ${KBMS_LLM_API_KEY:}
+    timeout-seconds: ${KBMS_LLM_TIMEOUT:180}
+  rag:
+    top-k: ${KBMS_RAG_TOP_K:5}
+    # Cosine similarity floor. Below this the evidence is treated as inadequate: no model call,
+    # the insufficiency message is returned instead.
+    min-similarity: ${KBMS_RAG_MIN_SIMILARITY:0.35}
+    max-question-chars: ${KBMS_RAG_MAX_QUESTION:2000}
+    max-context-chars: ${KBMS_RAG_MAX_CONTEXT:24000}
+    no-context-answer: ${KBMS_RAG_NO_CONTEXT_ANSWER:I could not find enough information in the knowledge base to answer that question.}
+
+logging:
+  level:
+    com.kbms: ${KBMS_LOG_LEVEL:INFO}

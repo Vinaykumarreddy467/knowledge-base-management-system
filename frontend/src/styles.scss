@@ -1,0 +1,35 @@
+@import 'primeicons/primeicons.css';
+@import 'primeflex/primeflex.css';
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+/* Unknown elements default to display:inline, which lets the app shrink-wrap
+   instead of filling the viewport. Force a block box. */
+app-root {
+  display: block;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--p-surface-50);
+  color: var(--p-surface-900);
+}
+
+a {
+  color: var(--p-primary-color);
+  text-decoration: none;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.article-content {
+  line-height: 1.7;
+  white-space: pre-wrap;
+}

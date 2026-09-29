@@ -1,0 +1,41 @@
+# Build output
+dist/
+target/
+node_modules/
+.angular/
+out-tsc/
+
+# Local configuration and secrets
+.env
+*.local
+*.local.json
+
+# Uploaded documents and extracted text live outside the database
+data/
+backend/data/
+
+# Logs and local scratch
+*.log
+logs/
+
+# Editor and OS noise
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local agent tooling: these hardcode absolute paths to this machine
+# (C:\Users\<user>\...) and are not part of the application.
+.opencode/
+.claude/
+.cursor/
+.codex/
+.mcp/
+.hooks/
+hooks/
+opencode.json
+copilot-hooks.json
+.context-layer.json
+.playwright-mcp/

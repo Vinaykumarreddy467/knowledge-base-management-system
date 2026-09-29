@@ -1,0 +1,24 @@
+name: kbms
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: kbms-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-kbms}
+      POSTGRES_USER: ${DB_USERNAME:-kbms}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-kbms}
+    ports:
+      # 55432 by default: a native PostgreSQL install usually owns 5432.
+      - "${DB_PORT:-55432}:5432"
+    volumes:
+      - kbms-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-kbms} -d ${DB_NAME:-kbms}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  kbms-db-data:
+
