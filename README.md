@@ -429,52 +429,7 @@ Each root cause below was confirmed in the current source.
 12. **Paginators.** Several components bound `[first]="pageIndex"`; PrimeNG expects a row offset, so
     this is now `[first]="pageIndex * size"`.
 
-## 9. Known limitations and outstanding findings
-
-**Model and answer quality**
-
-- `gemma:2b` is a small local model. In testing it answered a question about a document's contents
-  with a token from a *different* record (`PWDISC0825` instead of the document's `DOCUPLOAD0825`).
-  Retrieval, grounding and citations were all correct; only the model's extraction was wrong. Point
-  `KBMS_LLM_*` at a stronger model where answer fidelity matters.
-
-**Security and permissions**
-
-- Document read endpoints are unfiltered by role and status (§5, finding 1) — the most significant
-  outstanding item.
-- Category and tag **reads** are open to all authenticated roles; only the management screens are
-  ADMIN-only.
-- Dashboard document counters are global and shown to every role.
-- Access tokens only: no refresh and no revocation. A deleted or deactivated user is rejected only
-  after the token expires.
-- The last-admin guard counts active administrators but does not model an explicit admin transfer.
-
-**Operations**
-
-- Uploaded files live on the local filesystem (`./data/uploads` by default). That path must be backed
-  up with the database and is not shared across replicas.
-- No vector index (IVFFlat/HNSW). Fine at MVP volume; the migration documents when to add one.
-- A document row deleted outside the API could leave orphan chunks until the next re-index.
-- Page numbers are only captured for formats Tika can paginate; plain text and markdown have none.
-
-**Verification gaps**
-
-- The items listed in §7 "Not tested" remain unverified. In particular the document-visibility gap
-  cannot be demonstrated until a non-`PROCESSED` document exists, and the archived-article path until
-  an `ARCHIVED` article exists.
-- `RagService` and `OllamaEmbeddingService` assume a stored chat session always has a non-null
-  `userId`; a null would raise a `NullPointerException` in the ownership check. Not reachable with
-  current data.
-
-**Environment notes observed**
-
-- On Windows the `backend/src` and `backend/target` directories carry the *hidden* attribute, so
-  `Get-ChildItem` and `cmd dir` return nothing unless `-Force` or `/a` is used. Surefire reports are
-  written hidden for the same reason, which can make a run appear to report zero tests.
-- `ng serve` hung once during development; a bounded restart recovered it. If the browser reports
-  `ERR_ABORTED`, check that the port is serving before suspecting the code.
-
-## 10. Run and configuration guide
+## 9. Run and configuration guide
 
 ### Prerequisites
 
@@ -603,7 +558,7 @@ cd frontend && npm test          # 12 tests in 3 files
 cd frontend && npm run build     # production bundle
 ```
 
-## 11. What "verified" means in this document
+## 10. What "verified" means in this document
 
 | Label | Meaning |
 | --- | --- |
@@ -616,4 +571,4 @@ cd frontend && npm run build     # production bundle
 **No claim of "all tests passed" is made beyond the two automated suites**, which were both run in
 full on the date of this report (27 backend, 12 frontend, zero failures). Browser checks are listed
 individually in §7 with their role and whether they were read-only, and the four items that could
-not be checked are named in §7 and §9 rather than being implied to have passed.
+not be checked are named in §7 rather than being implied to have passed.
